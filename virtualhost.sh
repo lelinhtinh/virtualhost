@@ -11,7 +11,8 @@ apacheUser=$(ps -ef | egrep '(httpd|apache2|apache)' | grep -v root | head -n1 |
 email='webmaster@localhost'
 sitesEnabled='/etc/apache2/sites-enabled/'
 sitesAvailable='/etc/apache2/sites-available/'
-userDir='/var/www/'
+userDir=$HOME'/www/'
+userName=${HOME##*/}
 sitesAvailabledomain=$sitesAvailable$domain.conf
 
 ### don't modify from here unless you know what you are doing ####
@@ -51,6 +52,8 @@ if [ "$action" == 'create' ]
 			echo -e $"This domain already exists.\nPlease Try Another one"
 			exit;
 		fi
+
+		mkdir -p www
 
 		### check if directory exists or not
 		if ! [ -d $rootDir ]; then
@@ -115,12 +118,7 @@ if [ "$action" == 'create' ]
 		fi
 
 		if [ "$owner" == "" ]; then
-			iam=$(whoami)
-			if [ "$iam" == "root" ]; then
-				chown -R $apacheUser:$apacheUser $rootDir
-			else
-				chown -R $iam:$iam $rootDir
-			fi
+			chown -R $userName:$userName $rootDir
 		else
 			chown -R $owner:$owner $rootDir
 		fi
