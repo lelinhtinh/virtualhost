@@ -1,7 +1,7 @@
 Virtualhost Manage Script
 ===========
 
-Bash Script to allow create or delete apache/nginx virtual hosts on Ubuntu on a quick way.
+Bash Script to allow create or delete apache virtual hosts on Ubuntu on a quick way.
 
 ## Installation ##
 
@@ -23,10 +23,8 @@ $ sudo cp /path/to/virtualhost.sh /usr/local/bin/virtualhost
 
 ```bash
 $ cd /usr/local/bin
-$ wget -O virtualhost https://raw.githubusercontent.com/RoverWire/virtualhost/master/virtualhost.sh
+$ wget -O virtualhost https://github.com/lelinhtinh/virtualhost/raw/master/virtualhost.sh
 $ chmod +x virtualhost
-$ wget -O virtualhost-nginx https://raw.githubusercontent.com/RoverWire/virtualhost/master/virtualhost-nginx.sh
-$ chmod +x virtualhost-nginx
 ```
 
 ## Usage ##
@@ -48,34 +46,26 @@ $ sudo virtualhost [create | delete] [domain] [optional host_dir]
 to create a new virtual host:
 
 ```bash
-$ sudo virtualhost create mysite.dev
+$ sudo virtualhost create mysite.local
 ```
 to create a new virtual host with custom directory name:
 
 ```bash
-$ sudo virtualhost create anothersite.dev my_dir
+$ sudo virtualhost create anothersite.local my_dir
 ```
 to delete a virtual host
 
 ```bash
-$ sudo virtualhost delete mysite.dev
+$ sudo virtualhost delete mysite.local
 ```
 
 to delete a virtual host with custom directory name:
 
 ```
-$ sudo virtualhost delete anothersite.dev my_dir
+$ sudo virtualhost delete anothersite.local my_dir
 ```
 ### Localization
 
-For Apache:
-
 ```bash
 $ sudo cp /path/to/locale/<language>/virtualhost.mo /usr/share/locale/<language>/LC_MESSAGES/
-```
-
-For NGINX:
-
-```bash
-$ sudo cp /path/to/locale/<language>/virtualhost-nginx.mo /usr/share/locale/<language>/LC_MESSAGES/
-```
+``
