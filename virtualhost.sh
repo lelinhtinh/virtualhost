@@ -35,10 +35,10 @@ do
 done
 
 if [ "$rootDir" == "" ]; then
-	rootDir=${domain//./}
+	rootDir=${domain//.[a-z]*/}
 fi
 
-### if root dir starts with '/', don't use /var/www as default starting point
+### if root dir starts with '/', don't use /home/$USER/www as default starting point
 if [[ "$rootDir" =~ ^/ ]]; then
 	userDir=''
 fi
