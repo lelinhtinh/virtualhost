@@ -3,7 +3,7 @@ Virtualhost Manage Script
 
 Bash Script to easy create or delete apache virtual hosts on Debian.
 
-By default, this script will use `$HOME/www/` as default starting point, instead of `/var/www/` as [the original script](https://github.com/RoverWire/virtualhost).
+By default, this script will use `$HOME/www/` as default starting point, instead of `/var/www/` in [the original script](https://github.com/RoverWire/virtualhost).
 
 ## Installation
 
