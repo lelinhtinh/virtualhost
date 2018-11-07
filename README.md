@@ -1,69 +1,38 @@
 Virtualhost Manage Script
-===========
+=========================
 
-Bash Script to allow create or delete apache virtual hosts on Ubuntu on a quick way.
+Bash Script to easy create or delete apache virtual hosts on Debian.
 
-## Installation ##
+By default, this script will use `$HOME/www/` as default starting point, instead of `/var/www/` as [the original script](https://github.com/RoverWire/virtualhost).
 
-1. Download the script
-2. Apply permission to execute:
-
-```
-$ chmod +x /path/to/virtualhost.sh
-```
-
-3. Optional: if you want to use the script globally, then you need to copy the file to your /usr/local/bin directory, is better
-if you copy it without the .sh extension:
-
-```bash
-$ sudo cp /path/to/virtualhost.sh /usr/local/bin/virtualhost
-```
-
-### For Global Shortcut ###
+## Installation
 
 ```bash
 $ cd /usr/local/bin
-$ wget -O virtualhost https://github.com/lelinhtinh/virtualhost/raw/master/virtualhost.sh
-$ chmod +x virtualhost
+$ sudo wget -O virtualhost https://github.com/lelinhtinh/virtualhost/raw/master/virtualhost.sh
+$ sudo chmod +x virtualhost
 ```
 
-## Usage ##
-
-Basic command line syntax:
-
-```bash
-$ sudo sh /path/to/virtualhost.sh [create | delete] [domain] [optional host_dir]
-```
-
-With script installed on /usr/local/bin
+## Usage
 
 ```bash
 $ sudo virtualhost [create | delete] [domain] [optional host_dir]
 ```
 
-### Examples ###
+### Examples
 
-to create a new virtual host:
+Create a new virtual host:
 
 ```bash
 $ sudo virtualhost create mysite.test
 ```
-to create a new virtual host with custom directory name:
 
-```bash
-$ sudo virtualhost create anothersite.test my_dir
-```
-to delete a virtual host
+Delete a virtual host:
 
 ```bash
 $ sudo virtualhost delete mysite.test
 ```
 
-to delete a virtual host with custom directory name:
-
-```
-$ sudo virtualhost delete anothersite.test my_dir
-```
 ### Localization
 
 ```bash
