@@ -11,8 +11,9 @@ apacheUser=$(ps -ef | egrep '(httpd|apache2|apache)' | grep -v root | head -n1 |
 email='webmaster@localhost'
 sitesEnabled='/etc/apache2/sites-enabled/'
 sitesAvailable='/etc/apache2/sites-available/'
-userDir=$HOME'/www/'
-userName=${HOME##*/}
+userHome=$(eval echo ~${SUDO_USER})
+userDir=$userHome'/www/'
+userName=${userHome##*/}
 sitesAvailabledomain=$sitesAvailable$domain.conf
 
 ### don't modify from here unless you know what you are doing ####
@@ -30,7 +31,7 @@ fi
 
 while [ "$domain" == "" ]
 do
-	echo -e $"Please provide domain. e.g.dev,staging"
+	echo -e $"Please provide domain. e.g.test,staging"
 	read domain
 done
 
@@ -54,6 +55,7 @@ if [ "$action" == 'create' ]
 		fi
 
 		mkdir -p www
+		chown -R $userName:$userName www
 
 		### check if directory exists or not
 		if ! [ -d $rootDir ]; then
