@@ -1,50 +1,37 @@
 #!/bin/bash
-### Set Language
-TEXTDOMAIN=virtualhost
 
 ### Set default parameters
 action=$1
 domain=$2
-rootDir=$3
-owner=$(who am i | awk '{print $1}')
-apacheUser=$(ps -ef | egrep '(httpd|apache2|apache)' | grep -v root | head -n1 | awk '{print $1}')
-email='webmaster@localhost'
-sitesEnabled='/etc/apache2/sites-enabled/'
+
 sitesAvailable='/etc/apache2/sites-available/'
 userHome=$(eval echo ~${SUDO_USER})
-userDir=$userHome'/www/'
+wwwDir=$userHome'/www/'
 userName=${userHome##*/}
 sitesAvailabledomain=$sitesAvailable$domain.conf
+wwwConf='/etc/apache2/conf-enabled/www.conf'
 
-### don't modify from here unless you know what you are doing ####
+### don't modify from here unless you know what you are doing
 
 if [ "$(whoami)" != 'root' ]; then
-	echo $"You have no permission to run $0 as non-root user. Use sudo"
+	echo $"You have no permission to run $0 as non-root user"
 		exit 1;
 fi
 
 if [ "$action" != 'create' ] && [ "$action" != 'delete' ]
 	then
-		echo $"You need to prompt for action (create or delete) -- Lower-case only"
+		echo $"You need to prompt for action (create or delete). Lower-case only"
 		exit 1;
 fi
 
 while [ "$domain" == "" ]
 do
-	echo -e $"Please provide domain. e.g.test,staging"
+	echo -e $"Please provide domain (e.g., abc.test)"
 	read domain
 done
 
-if [ "$rootDir" == "" ]; then
-	rootDir=${domain//.[a-z]*/}
-fi
-
-### if root dir starts with '/', don't use /home/$USER/www as default starting point
-if [[ "$rootDir" =~ ^/ ]]; then
-	userDir=''
-fi
-
-rootDir=$userDir$rootDir
+rootDir=$wwwDir${domain//.[a-z]*/}
+email="webmaster@$domain"
 
 if [ "$action" == 'create' ]
 	then
@@ -54,15 +41,32 @@ if [ "$action" == 'create' ]
 			exit;
 		fi
 
-		mkdir -p www
-		chown -R $userName:$userName www
+		### check if www directory exists or not
+		if ! [ -d $wwwDir ]; then
+			mkdir $wwwDir
+			chown -R $userName:$userName $wwwDir
+		fi
+
+		### create www directory rules file
+		if ! [ -e $wwwConf ]; then
+			if ! echo "
+<Directory $wwwDir>
+	Options Indexes FollowSymLinks
+	AllowOverride None
+	Require all granted
+</Directory>
+" > $wwwConf
+			then
+				echo -e $"There is an ERROR creating www.conf file"
+				exit;
+			fi
+		fi
 
 		### check if directory exists or not
 		if ! [ -d $rootDir ]; then
-			### create the directory
 			mkdir $rootDir
-			### give permission to root dir
-			chmod 755 $rootDir
+			chown -R $userName:$userName $rootDir
+
 			### write test file in the new domain dir
 			if ! echo "<?php echo phpinfo(); ?>" > $rootDir/phpinfo.php
 			then
@@ -75,25 +79,26 @@ if [ "$action" == 'create' ]
 
 		### create virtual host rules file
 		if ! echo "
-		<VirtualHost *:80>
-			ServerAdmin $email
-			ServerName $domain
-			ServerAlias $domain
-			DocumentRoot $rootDir
-			<Directory />
-				AllowOverride All
-			</Directory>
-			<Directory $rootDir>
-				Options Indexes FollowSymLinks MultiViews
-				AllowOverride all
-				Require all granted
-			</Directory>
-			ErrorLog /var/log/apache2/$domain-error.log
-			LogLevel error
-			CustomLog /var/log/apache2/$domain-access.log combined
-		</VirtualHost>" > $sitesAvailabledomain
+<VirtualHost *:80>
+	ServerAdmin $email
+	ServerName $domain
+	ServerAlias $domain
+	DocumentRoot $rootDir
+	<Directory />
+		AllowOverride All
+	</Directory>
+	<Directory $rootDir>
+		Options Indexes FollowSymLinks MultiViews
+		AllowOverride all
+		Require all granted
+	</Directory>
+	ErrorLog $rootDir/$domain-error.log
+	LogLevel error
+	CustomLog $rootDir/$domain-access.log combined
+</VirtualHost>
+" > $sitesAvailabledomain
 		then
-			echo -e $"There is an ERROR creating $domain file"
+			echo -e $"There is an ERROR creating $domain.conf file"
 			exit;
 		else
 			echo -e $"\nNew Virtual Host Created\n"
@@ -106,23 +111,6 @@ if [ "$action" == 'create' ]
 			exit;
 		else
 			echo -e $"Host added to /etc/hosts file \n"
-		fi
-
-		### Add domain in /mnt/c/Windows/System32/drivers/etc/hosts (Windows Subsytem for Linux)
-		if [ -e /mnt/c/Windows/System32/drivers/etc/hosts ]
-		then
-			if ! echo -e "\r127.0.0.1       $domain" >> /mnt/c/Windows/System32/drivers/etc/hosts
-			then
-				echo $"ERROR: Not able to write in /mnt/c/Windows/System32/drivers/etc/hosts (Hint: Try running Bash as administrator)"
-			else
-				echo -e $"Host added to /mnt/c/Windows/System32/drivers/etc/hosts file \n"
-			fi
-		fi
-
-		if [ "$owner" == "" ]; then
-			chown -R $userName:$userName $rootDir
-		else
-			chown -R $owner:$owner $rootDir
 		fi
 
 		### enable website
@@ -143,13 +131,6 @@ if [ "$action" == 'create' ]
 			### Delete domain in /etc/hosts
 			newhost=${domain//./\\.}
 			sed -i "/$newhost/d" /etc/hosts
-
-			### Delete domain in /mnt/c/Windows/System32/drivers/etc/hosts (Windows Subsytem for Linux)
-			if [ -e /mnt/c/Windows/System32/drivers/etc/hosts ]
-			then
-				newhost=${domain//./\\.}
-				sed -i "/$newhost/d" /mnt/c/Windows/System32/drivers/etc/hosts
-			fi
 
 			### disable website
 			a2dissite $domain

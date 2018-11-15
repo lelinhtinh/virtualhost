@@ -16,7 +16,7 @@ $ sudo chmod +x virtualhost
 ## Usage
 
 ```bash
-$ sudo virtualhost [create | delete] [domain] [optional host_dir]
+$ sudo virtualhost [create | delete] [domain]
 ```
 
 ### Examples
@@ -31,10 +31,4 @@ Delete a virtual host:
 
 ```bash
 $ sudo virtualhost delete mysite.test
-```
-
-### Localization
-
-```bash
-$ sudo cp /path/to/locale/<language>/virtualhost.mo /usr/share/locale/<language>/LC_MESSAGES/
 ```
